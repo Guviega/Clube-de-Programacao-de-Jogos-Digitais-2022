@@ -24,33 +24,24 @@ public class Janela extends JFrame{
 	//JPanel, "TELA DE PINTURA" DA JANELA
 	private JPanel tela;
 	
-	//POSIÇÃO Y DO SOL QUE SERÁ ANIMADO
-	private int solY = 100;
+	//SOL A PARTIR DA CLASSE ELEMENTO
+	private Elemento sol;
 	
 	public Janela() {
 		
-		//INSTANCIA JPANEL, "ABRINDO" PARA REALIZAR ALTERAÇÕES NA INSTÂNCIA
 		tela = new JPanel() {
 		
-			//METODO paintComponent USADO PARA "PINTAR" NA TELA
 			public void paintComponent(Graphics g) {
-				//PRIMEIRO SE ESCOLHE A COR COM A CLASSE java.awt.Color
 				g.setColor(Color.BLACK);
-				
-				//E DESENHA-SE O OBJETO
-				//AQUI ESTAMOS PINTANDO UM FUNDO PRETO COM INÍCIO EM (0, 0) - CANTO SUPERIOR ESQUERDO
-				//E COM O TAMANHO DE TODA A TELA - tela.getWidth() e tela.getHeight() -
 				g.fillRect(0, 0, tela.getWidth(), tela.getHeight());
-				// ***COORDENADAS NO JFRAME FUNCIONAM COMO NO PLANO CARTESIANO, COM EIXOS X E Y
-			
+				
 				g.setColor(Color.YELLOW);
-				//USAMOS A VARIAVEL solY COMO POSIÇÃO DO SOL NO EIXO Y
-				g.fillOval(100, solY, 100, 100);
+				//DESENHANDO O SOL USANDO PARAMETROS DO ELEMENTO
+				g.fillOval(sol.getPx(), sol.getPy(), sol.getLargura(), sol.getAltura());
 				
 				g.setColor(Color.GREEN);
 				g.fillRect(0, tela.getHeight() - 100, tela.getWidth(), 100);
 				
-				//CORES PODEM SER CRIADAS USANDO A CLASSE Color E CÓDIGO RGB
 				Color marrom = new Color(150, 75, 0);
 				
 				g.setColor(marrom);
@@ -59,26 +50,24 @@ public class Janela extends JFrame{
 				g.setColor(Color.RED);
 				g.fillPolygon(new int[]{tela.getWidth() - 125, tela.getWidth() - 100, tela.getWidth() - 75}, new int[]{tela.getHeight() - 125, tela.getHeight() - 175, tela.getHeight() - 125}, 3);
 			
-				//TEXTOS(Strings) TAMBÉM PODEM SER DESENHADOS NA TELA
 				g.setColor(Color.WHITE);
-				g.drawString("Sol Y: "+solY, tela.getWidth() / 2, 30);
-				
+				g.drawString("Sol Y: "+sol.getPy(), tela.getWidth() / 2, 30);
 			}
-			
 		};
 		
-		//ADICIONA O OBJETO tela AO JFRAME;
 		getContentPane().add(tela);
 		
 		//MÉTODOS DE JFRAME, DEFINE TAMANHO DA JANELA E REDIMENSIONAMENTO
 		setSize(LARGURA, ALTURA);
 		setResizable(false);
-		
-		//DEFINE O "X" DA JANELA COMO ENCERRAMENTO DO SISTEMA
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-		//DEFINE VISUALIZAÇÃO DA JANELA
 		setVisible(true);
+		
+		//INICIALIZANDO SOL PASSANDO PARAMETROS
+		//POSIÇÃO (150, 150)
+		//TAMANHO 100px x 100px
+		//VELOCIDADE 3
+		sol = new Elemento(150, 150, 100, 100, 3);
 	}
 	
 	//METODO PARA ATUALIZAR A TELA E REALIZAR A ANIMAÇÃO
@@ -98,8 +87,8 @@ public class Janela extends JFrame{
 			
 			//SE O TEMPO DE SISTEMA ULTRAPASSAR prxAtt, REALIZA-SE A ATUALIZAÇÃO DA TELA
 			if (System.currentTimeMillis() >= prxAtt) {
-				//POSIÇÃO Y DO SOL AUMENTA EM 3px
-				solY += 3;
+				//POSIÇÃO Y DO SOL AUMENTA CONFORME A VELOCIDADE
+				sol.incPy(sol.getVelocidade());
 				
 				//MÉTODO QUE ATUALIZA A TELA, PINTANDO NOVAMENTE OS OBJETOS
 				tela.repaint();
@@ -109,8 +98,8 @@ public class Janela extends JFrame{
 			}
 			
 			//SE O SOL ULTRAPASSAR O CHÃO(SE PÔR) ENTÃO RETORNA PARA O TOPO DA TELA
-			if (solY >= tela.getHeight() - 100) {
-				solY = -100;
+			if (sol.getPy() >= tela.getHeight() - 100) {
+				sol.setPy(-100);;
 			}
 		}
 		
