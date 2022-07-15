@@ -9,11 +9,23 @@ import javax.swing.JPanel;
 	//CLASSE JANELA EXTENDE JFRAME 
 public class Janela extends JFrame{
 	
+	//BOOLEAN USADA PARA CONTROLAR O FLUXO DO JOGO
+	private boolean jogando = true;
+	
+	//TAXA DE ATUALIZAÇÕES POR SEGUNDO
+	private int FPS = 20;
+	
+	//DURAÇÃO DE CADA ATUALIZAÇÃO (1 SEGUNDO DIVIDIDO PELA TAXA DE FRAMES)
+	private int ms = 1000 / FPS;
+	
 	//VARIÁVEIS PARA ALTURA E LARGURA DA JANELA
 	private int LARGURA = 480, ALTURA = 640;
 	
 	//JPanel, "TELA DE PINTURA" DA JANELA
 	private JPanel tela;
+	
+	//POSIÇÃO Y DO SOL QUE SERÁ ANIMADO
+	private int solY = 100;
 	
 	public Janela() {
 		
@@ -31,6 +43,10 @@ public class Janela extends JFrame{
 				g.fillRect(0, 0, tela.getWidth(), tela.getHeight());
 				// ***COORDENADAS NO JFRAME FUNCIONAM COMO NO PLANO CARTESIANO, COM EIXOS X E Y
 			
+				g.setColor(Color.YELLOW);
+				//USAMOS A VARIAVEL solY COMO POSIÇÃO DO SOL NO EIXO Y
+				g.fillOval(100, solY, 100, 100);
+				
 				g.setColor(Color.GREEN);
 				g.fillRect(0, tela.getHeight() - 100, tela.getWidth(), 100);
 				
@@ -43,8 +59,10 @@ public class Janela extends JFrame{
 				g.setColor(Color.RED);
 				g.fillPolygon(new int[]{tela.getWidth() - 125, tela.getWidth() - 100, tela.getWidth() - 75}, new int[]{tela.getHeight() - 125, tela.getHeight() - 175, tela.getHeight() - 125}, 3);
 			
-				g.setColor(Color.YELLOW);
-				g.fillOval(100, 100, 100, 100);
+				//TEXTOS(Strings) TAMBÉM PODEM SER DESENHADOS NA TELA
+				g.setColor(Color.WHITE);
+				g.drawString("Sol Y: "+solY, tela.getWidth() / 2, 30);
+				
 			}
 			
 		};
@@ -62,9 +80,44 @@ public class Janela extends JFrame{
 		//DEFINE VISUALIZAÇÃO DA JANELA
 		setVisible(true);
 	}
+	
+	//METODO PARA ATUALIZAR A TELA E REALIZAR A ANIMAÇÃO
+	public void animacao() {
+		//VARIÁVEL LONG PARA CONTROLAR A PRÓXIMA(PRX) ATUALIZAÇÃO(ATT)
+		long prxAtt = 0;
+		
+		//VARIÁVEL PARA ENCERRAR A ANIMAÇÃO
+		long encerraAnimacao = System.currentTimeMillis() + 10000;
+		
+		//ENQUANTO O JOGO ESTIVER RODANDO(jogando = true) REALIZA ATUALIZAÇÕES
+		while (jogando) {
+			//QUANDO O TEMPO DO SISTEMA CHEGAR A 10s ELE PARA
+			if (System.currentTimeMillis() >= encerraAnimacao) {
+				jogando = false;
+			}
+			
+			//SE O TEMPO DE SISTEMA ULTRAPASSAR prxAtt, REALIZA-SE A ATUALIZAÇÃO DA TELA
+			if (System.currentTimeMillis() >= prxAtt) {
+				//POSIÇÃO Y DO SOL AUMENTA EM 3px
+				solY += 3;
+				
+				//MÉTODO QUE ATUALIZA A TELA, PINTANDO NOVAMENTE OS OBJETOS
+				tela.repaint();
+				
+				//DEFINE A PRÓXIMA ATUALIZAÇÃO PARA O TEMPO ATUAL + O TEMPO DE ATUALIZAÇÃO
+				prxAtt = System.currentTimeMillis() + ms;
+			}
+			
+			//SE O SOL ULTRAPASSAR O CHÃO(SE PÔR) ENTÃO RETORNA PARA O TOPO DA TELA
+			if (solY >= tela.getHeight() - 100) {
+				solY = -100;
+			}
+		}
+		
+	}
 
 	public static void main(String[] args) {
-		new Janela();
+		new Janela().animacao();
 	}
 
 }
