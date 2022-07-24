@@ -62,7 +62,7 @@ public class Elemento {
 	
 	//MÉTODOS DE INCREMENTO
 	public void incPx(int px) {
-		this.py += px;
+		this.px += px;
 	}
 	
 	public void incPy(int py) {
