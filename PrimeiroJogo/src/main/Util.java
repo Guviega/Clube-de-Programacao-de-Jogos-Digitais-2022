@@ -28,5 +28,14 @@ public class Util {
 			break;
 		}
 	}
+	
+	//MÉTODO PARA VERIFICAR COLISÕES DE EIXOS HORIZONTAIS
+	public static boolean colide(Elemento a, Elemento b) {
+		if (a.getPx() + a.getLargura() >= b.getPx() && a.getPx() <= b.getPx() + b.getLargura()) {
+			return true;
+		}
+
+		return false;
+	}
 
 }

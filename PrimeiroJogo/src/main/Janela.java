@@ -18,6 +18,9 @@ public class Janela extends JFrame{
 	private int LARGURA = 480, ALTURA = 640;
 	private JPanel tela;
 	
+	//LINHA DE LIMITE, SE OS INIMIGOS ENCOSTAREM O JOGO É ENCERRADO
+	private int linhaLimite;
+	
 	private Elemento player;
 	
 	private Elemento inimigos[];
@@ -71,6 +74,10 @@ public class Janela extends JFrame{
 				for (Elemento inimigo : inimigos) {
 					g.fillRect(inimigo.getPx(), inimigo.getPy(), inimigo.getLargura(), inimigo.getAltura());
 				}
+				
+				//DESENHA LINHA LIMITE
+				g.setColor(Color.WHITE);
+				g.fillRect(0, linhaLimite, tela.getWidth(), 2);
 			}
 		};
 		
@@ -79,6 +86,9 @@ public class Janela extends JFrame{
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
+		
+		//DEFINE LINHA LIMITE
+		linhaLimite = tela.getHeight() - 50;
 		
 		player.setPx(tela.getWidth() / 2 - player.getLargura() / 2);
 		player.setPy(tela.getHeight() - player.getAltura()); 
@@ -112,9 +122,26 @@ public class Janela extends JFrame{
 		//TIRO SEGUE O JOGADOR
 		tiro.setPx(player.getPx() + player.getLargura() / 2);
 	
+		for (Elemento inimigo : inimigos) {
+
+			//SE INIMIGO ENCOSTAR NA LINHA LIMITE O JOGO É ENCERRADO
+			if (inimigo.getPy() > linhaLimite - inimigo.getAltura()) {
+				jogando = false;
+				break;
+			}
+
+			//SE INIMIGO COLIDIR COM O TIRO E NÃO ESTIVER NA BORDA DA TELA, É EMPURRADO PARA TRÁS
+			if (Util.colide(inimigo, tiro) && inimigo.getPy() > 0) {
+				inimigo.incPy(inimigo.getVelocidade() *-2);
+				tiro.setPy(inimigo.getPy());
+			}
+			else
+				//SE NADA DISSO OCORRER, O INIMIGO VAI EM DIREÇÃO À LINHA LIMITE
+				inimigo.incPy(inimigo.getVelocidade());
+		}
+		
 	}
 	
-
 	public static void main(String[] args) {
 		new Janela().inicia();
 	}
