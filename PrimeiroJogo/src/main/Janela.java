@@ -76,8 +76,11 @@ public class Janela extends JFrame{
 				g.setColor(Color.WHITE);
 				g.fillRect(0, linhaLimite, tela.getWidth(), 2);
 				
-				//DESENHA PONTUAÇÃO NO CANTO DA TELA (10, 20)
+				//DESENHA PONTUAÇÃO NO CANTO DA TELA
 				g.drawString("Pontos: "+String.valueOf(pontos), 10, 20);
+				g.drawString("Ultima: "+PontuacaoManage.getUltima(), 10, 35);
+				g.drawString("Recorde: "+PontuacaoManage.getRecorde(), 10, 50);
+				
 			}
 		};
 		
@@ -105,9 +108,17 @@ public class Janela extends JFrame{
 				prxAtt = System.currentTimeMillis() + ms;
 			}
 		}
+		
+		//QUANDO JOGANDO = FALSE, REALIZA A ATUALIZAÇÃO DAS PONTUAÇÕES E DO ARQUIVO
+		if (pontos > PontuacaoManage.getRecorde())
+			PontuacaoManage.setRecorde(pontos);
+		PontuacaoManage.setUltima(pontos);
+		PontuacaoManage.escrever();
+		
 	}
 	
 	public void atualiza() {
+		
 		if (Util.right) 
 			player.incPx(player.getVelocidade());
 		if (Util.left)
@@ -141,6 +152,9 @@ public class Janela extends JFrame{
 	}
 	
 	public static void main(String[] args) {
+		//É EXTREMAMENTE NECESSÁRIO LER O ARQUIVO ANTES DE INICIAR O JOGO
+		PontuacaoManage.ler();
+		
 		new Janela().inicia();
 	}
 
