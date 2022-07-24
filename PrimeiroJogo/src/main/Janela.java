@@ -22,13 +22,14 @@ public class Janela extends JFrame{
 	private JPanel tela;
 	private Elemento player;
 	
+	private Elemento inimigos[];
+	private int inimigosQTD = 7, inimigosSPC =15;
+	
 	public Janela() {
 		
 		this.addKeyListener(new KeyListener() {
-			
 			@Override
 			public void keyTyped(KeyEvent e) {
-				
 			}
 			
 			@Override
@@ -44,6 +45,13 @@ public class Janela extends JFrame{
 		
 		player = new Elemento(0, 0, 50, 50, 5);
 		
+		//GERA INIMIGOS CONFORME A QTD ESCOLHIDA, COM UM ESPAÇAMENTO ENTRE CADA
+		inimigos = new Elemento[inimigosQTD];
+		for (int i = 0; i < inimigos.length; i++) {
+			int espaco = i * 50 + inimigosSPC * (i + 1);
+			inimigos[i] = new Elemento(espaco, 0, 50, 50, 1);
+		}
+		
 		tela = new JPanel() {
 		
 			public void paintComponent(Graphics g) {
@@ -52,6 +60,12 @@ public class Janela extends JFrame{
 				
 				g.setColor(Color.GREEN);
 				g.fillRect(player.getPx(), player.getPy(), player.getLargura(), player.getAltura());
+				
+				//PINTA CADA INIMIGO NA COR VERMELHA
+				g.setColor(Color.RED);
+				for (Elemento inimigo : inimigos) {
+					g.fillRect(inimigo.getPx(), inimigo.getPy(), inimigo.getLargura(), inimigo.getAltura());
+				}
 			}
 		};
 		
@@ -64,7 +78,7 @@ public class Janela extends JFrame{
 		setVisible(true);
 		
 		player.setPx(tela.getWidth() / 2 - player.getLargura() / 2);
-		player.setPy(tela.getHeight() / 2 - player.getAltura() / 2); 
+		player.setPy(tela.getHeight() - player.getAltura()); 
 	}
 	
 	//METODO PARA ATUALIZAR A TELA E REALIZAR A ANIMAÇÃO
@@ -86,14 +100,16 @@ public class Janela extends JFrame{
 	
 	//MÉTODO SEPARADO QUE IRÁ REALIZAR AS ATUALIZAÇÕES DO JOGO
 	public void atualiza() {
-		if (Util.up) 
-			player.incPy(player.getVelocidade()*-1);
-		if (Util.down) 
-			player.incPy(player.getVelocidade());
 		if (Util.right) 
 			player.incPx(player.getVelocidade());
 		if (Util.left)
 			player.incPx(player.getVelocidade()*-1);
+		
+		//SE PLAYER ULTRAPASSAR A BORDA DA TELA, RETORNA NO OUTRO LADO
+		if (player.getPx() > tela.getWidth())
+			player.setPx(0);
+		if (player.getPx() < 0)
+			player.setPx(tela.getWidth() - player.getLargura());
 	}
 
 	public static void main(String[] args) {
