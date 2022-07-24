@@ -8,7 +8,6 @@ import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 	
-	//CLASSE JANELA EXTENDE JFRAME 
 public class Janela extends JFrame{
 	
 	private boolean jogando = true;
@@ -17,9 +16,10 @@ public class Janela extends JFrame{
 	
 	private int LARGURA = 480, ALTURA = 640;
 	private JPanel tela;
-	
-	//LINHA DE LIMITE, SE OS INIMIGOS ENCOSTAREM O JOGO É ENCERRADO
 	private int linhaLimite;
+	
+	//PONTUAÇÃO
+	private int pontos = 0;
 	
 	private Elemento player;
 	
@@ -54,7 +54,6 @@ public class Janela extends JFrame{
 			inimigos[i] = new Elemento(espaco, 0, 50, 50, 1);
 		}
 		
-		//ELEMENTO TIRO COM 1 DE LARGURA
 		tiro = new Elemento(0, 0, 1, 0, 0);
 		
 		tela = new JPanel() {
@@ -63,7 +62,6 @@ public class Janela extends JFrame{
 				g.setColor(Color.BLACK);
 				g.fillRect(0, 0, tela.getWidth(), tela.getHeight());
 				
-				//PINTA TIRO POR BAIXO DO JOGADOR
 				g.setColor(Color.BLUE);
 				g.fillRect(tiro.getPx(), tiro.getPy(), tiro.getLargura(), tela.getHeight());
 				
@@ -75,9 +73,11 @@ public class Janela extends JFrame{
 					g.fillRect(inimigo.getPx(), inimigo.getPy(), inimigo.getLargura(), inimigo.getAltura());
 				}
 				
-				//DESENHA LINHA LIMITE
 				g.setColor(Color.WHITE);
 				g.fillRect(0, linhaLimite, tela.getWidth(), 2);
+				
+				//DESENHA PONTUAÇÃO NO CANTO DA TELA (10, 20)
+				g.drawString("Pontos: "+String.valueOf(pontos), 10, 20);
 			}
 		};
 		
@@ -87,7 +87,6 @@ public class Janela extends JFrame{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 		
-		//DEFINE LINHA LIMITE
 		linhaLimite = tela.getHeight() - 50;
 		
 		player.setPx(tela.getWidth() / 2 - player.getLargura() / 2);
@@ -119,26 +118,25 @@ public class Janela extends JFrame{
 		if (player.getPx() < 0)
 			player.setPx(tela.getWidth() - player.getLargura());
 	
-		//TIRO SEGUE O JOGADOR
 		tiro.setPx(player.getPx() + player.getLargura() / 2);
 	
 		for (Elemento inimigo : inimigos) {
 
-			//SE INIMIGO ENCOSTAR NA LINHA LIMITE O JOGO É ENCERRADO
 			if (inimigo.getPy() > linhaLimite - inimigo.getAltura()) {
 				jogando = false;
 				break;
 			}
 
-			//SE INIMIGO COLIDIR COM O TIRO E NÃO ESTIVER NA BORDA DA TELA, É EMPURRADO PARA TRÁS
 			if (Util.colide(inimigo, tiro) && inimigo.getPy() > 0) {
 				inimigo.incPy(inimigo.getVelocidade() *-2);
 				tiro.setPy(inimigo.getPy());
 			}
 			else
-				//SE NADA DISSO OCORRER, O INIMIGO VAI EM DIREÇÃO À LINHA LIMITE
 				inimigo.incPy(inimigo.getVelocidade());
 		}
+		
+		//A CADA ATUALIZAÇÃO, A PONTUAÇÃO AUMENTA EM 1 (PONTOS POR SEGUNDO = FPS)
+		pontos += 1;
 		
 	}
 	
