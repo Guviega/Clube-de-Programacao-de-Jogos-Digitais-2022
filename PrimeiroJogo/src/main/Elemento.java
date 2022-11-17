@@ -1,25 +1,32 @@
 package main;
 
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
+
 public class Elemento {
-	
-	//ATRIBUTOS COMUNS ENTRE ELEMENTOS
+
+	// ATRIBUTOS COMUNS ENTRE ELEMENTOS
 	private int px, py, largura, altura, velocidade;
-	
-	//CONSTRUTOR VAZIO
+	private Image image;
+
+	// CONSTRUTOR VAZIO
 	public Elemento() {
 	}
 
-	//CONSTRUTOR COM PARAMETROS
-	public Elemento(int px, int py, int largura, int altura, int velocidade) {
+	// UM NOVO PARAMETRO imagePath É ADICIONADO AO CONSTRUTOR
+	public Elemento(int px, int py, int largura, int altura, int velocidade, String imagePath) {
 		super();
 		this.px = px;
 		this.py = py;
 		this.largura = largura;
 		this.altura = altura;
 		this.velocidade = velocidade;
+		//DEFININDO IMAGEM DO ELEMENTO
+		this.image = new ImageIcon(getClass().getResource(imagePath)).getImage();
 	}
 
-	//MÉTODOS GETTER E SETTER
+	// MÉTODOS GETTER E SETTER
 	public int getPx() {
 		return px;
 	}
@@ -59,13 +66,17 @@ public class Elemento {
 	public void setVelocidade(int velocidade) {
 		this.velocidade = velocidade;
 	}
-	
-	//MÉTODOS DE INCREMENTO
+
+	// MÉTODOS DE INCREMENTO
 	public void incPx(int px) {
 		this.px += px;
 	}
-	
+
 	public void incPy(int py) {
 		this.py += py;
+	}
+
+	public Image getImage() {
+		return this.image;
 	}
 }
