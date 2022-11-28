@@ -8,7 +8,9 @@ import javax.swing.JPanel;
 
 import model.Inimigo;
 import model.Player;
+import model.Tiro;
 import util.KeyListener;
+import util.Util;
 
 public class Jogo extends JFrame {
 
@@ -18,11 +20,13 @@ public class Jogo extends JFrame {
 	private int LARGURA = 540, ALTURA = 480;
 	private int espacamento = 8; // ESPACAMENTO PADRÃO DO JOGO
 	private int quantidadeInimigos = 13;
+	private int inimigosAtivos;
 
 	// ELEMENTOS DO JOGO
 	private JPanel tela;
 	private Player player;
 	private Inimigo inimigos[];
+	private Tiro tiro;
 
 	public Jogo() {
 		this.addKeyListener(new KeyListener());
@@ -49,6 +53,7 @@ public class Jogo extends JFrame {
 	}
 	
 	private void paintElementos(Graphics g) {
+		tiro.paintIfAtivo(g);
 		player.paint(g);
 		for (Inimigo inimigo : inimigos)
 			inimigo.paintIfAtivo(g);
@@ -69,9 +74,14 @@ public class Jogo extends JFrame {
 	}
 
 	private void carregajogo() {
+		inimigosAtivos = quantidadeInimigos;
+		
 		player = new Player(0, 0, 40, 40, 5);
 		player.setPx(tela.getWidth() / 2 - player.getLargura() / 2);
 		player.setPy(tela.getHeight() - player.getAltura() - espacamento);
+		
+		tiro = new Tiro(0, 0, 5, 15, 15);
+		tiro.setCor(Color.BLUE);
 		
 		inimigos = new Inimigo[quantidadeInimigos];
 		for (int i = 0; i < inimigos.length; i++) {
@@ -83,6 +93,23 @@ public class Jogo extends JFrame {
 
 	private void atualiza() {
 		movimentaPlayer();
+		tiroPlayer();
+		verificaInimigos();
+	}
+	
+	private void tiroPlayer() {
+		if (inimigosAtivos == 0)
+			jogando = false;
+		
+		if (KeyListener.space && !tiro.isAtivo()) {
+			tiro.setPx(player.getPx() + player.getLargura() / 2 - tiro.getLargura() / 2);
+			tiro.setPy(player.getPy());
+			tiro.setAtivo(true);
+		}
+		if (tiro.getPy() < 0)
+			tiro.setAtivo(false);
+		if (tiro.isAtivo())
+			tiro.incPy(tiro.getVelocidade() * -1);
 	}
 
 	private void movimentaPlayer() {
@@ -94,6 +121,20 @@ public class Jogo extends JFrame {
 			player.setPx(0);
 		if (player.getPx() < 0)
 			player.setPx(tela.getWidth() - player.getLargura());
+	}
+	
+	private void verificaInimigos() {
+		for (Inimigo inimigo : inimigos) {
+
+			if (!inimigo.isAtivo())
+				continue;
+
+			if (tiro.isAtivo() && inimigo.isAtivo() && Util.colide(inimigo, tiro)) {
+				inimigo.setAtivo(false);
+				inimigosAtivos--;
+				tiro.setAtivo(false);
+			}
+		}
 	}
 
 	public static void main(String[] args) {
