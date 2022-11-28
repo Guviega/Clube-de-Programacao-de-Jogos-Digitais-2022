@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import model.Inimigo;
 import model.Player;
 import util.KeyListener;
 
@@ -16,10 +17,12 @@ public class Jogo extends JFrame {
 	private int FPS = 30;
 	private int LARGURA = 540, ALTURA = 480;
 	private int espacamento = 8; // ESPACAMENTO PADRÃO DO JOGO
+	private int quantidadeInimigos = 13;
 
 	// ELEMENTOS DO JOGO
 	private JPanel tela;
 	private Player player;
+	private Inimigo inimigos[];
 
 	public Jogo() {
 		this.addKeyListener(new KeyListener());
@@ -31,8 +34,8 @@ public class Jogo extends JFrame {
 				g.setColor(Color.BLACK);
 				g.fillRect(0, 0, tela.getWidth(), tela.getHeight());
 
-				// PINTANDO ELEMENTO PLAYER
-				player.paint(g);
+				// PINTANDO ELEMENTOS
+				paintElementos(g);
 
 			}
 		};
@@ -43,6 +46,12 @@ public class Jogo extends JFrame {
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
+	}
+	
+	private void paintElementos(Graphics g) {
+		player.paint(g);
+		for (Inimigo inimigo : inimigos)
+			inimigo.paintIfAtivo(g);
 	}
 
 	private void inicia() {
@@ -63,6 +72,13 @@ public class Jogo extends JFrame {
 		player = new Player(0, 0, 40, 40, 5);
 		player.setPx(tela.getWidth() / 2 - player.getLargura() / 2);
 		player.setPy(tela.getHeight() - player.getAltura() - espacamento);
+		
+		inimigos = new Inimigo[quantidadeInimigos];
+		for (int i = 0; i < inimigos.length; i++) {
+			int espaco = i * 30 + espacamento * (i + 1);
+			inimigos[i] = new Inimigo(espaco + 2, espacamento, 25, 25, 1);
+			inimigos[i].setAtivo(true);
+		}
 	}
 
 	private void atualiza() {
