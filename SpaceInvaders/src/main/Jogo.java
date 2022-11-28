@@ -6,7 +6,8 @@ import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import model.Quadrado;
+import model.Player;
+import util.KeyListener;
 
 public class Jogo extends JFrame {
 
@@ -14,37 +15,36 @@ public class Jogo extends JFrame {
 	private boolean jogando;
 	private int FPS = 30;
 	private int LARGURA = 540, ALTURA = 480;
+	private int espacamento = 8; // ESPACAMENTO PADRÃO DO JOGO
 
 	// ELEMENTOS DO JOGO
 	private JPanel tela;
-	private Quadrado quadrado;
+	private Player player;
 
 	public Jogo() {
-		// TELA DE "PINTURA" DO JOGO
+		this.addKeyListener(new KeyListener());
+
 		tela = new JPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
 
-				// PINTA FUNDO PRETO
-				g.setColor(Color.BLACK); // DEFINE COR DE PINTURA
-				g.fillRect(0, 0, tela.getWidth(), tela.getHeight()); // PINTA OBJETO RETANGULAR DO TAMANHO DA TELA COMO
-			
-				//PINTANDO ELEMENTO QUADRADO
-				quadrado.paint(g);
-				
+				g.setColor(Color.BLACK);
+				g.fillRect(0, 0, tela.getWidth(), tela.getHeight());
+
+				// PINTANDO ELEMENTO PLAYER
+				player.paint(g);
+
 			}
 		};
 
 		// CONFIGURAÇÃO DA JANELA
-		getContentPane().add(tela); // ADICIONA JPANEL À JANELA
-		setSize(LARGURA, ALTURA); // DEFINE TAMANHO DA JANELA
-		setResizable(false); // DEFINE SE O USUÁRIO PODERÁ REDIMENSIONAR A JANELA
-		setDefaultCloseOperation(EXIT_ON_CLOSE); // IMPORTANTE: DEFINE 'X' DO WINDOWS COMO ENCERRADOR DO PROCESSO
-		setVisible(true); // DEFINE VISIBILIDADE DA JANELA
+		getContentPane().add(tela);
+		setSize(LARGURA, ALTURA);
+		setResizable(false);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setVisible(true);
 	}
 
-	// MÉTODO QUE FARÁ A ATUALIZAÇÃO DA TELA DO JOGO
-	// **UMA ANIMAÇÃO É UMA SUCESSÃO DE ATUALIZAÇÕES NA TELA, CONFORME O FPS
 	private void inicia() {
 		carregajogo();
 		jogando = true;
@@ -52,7 +52,7 @@ public class Jogo extends JFrame {
 
 		while (jogando) {
 			if (System.currentTimeMillis() >= prxAtt) {
-				quadrado.incPx(quadrado.getVelocidade()); //ANIMAÇÃO DO QUADRADO
+				atualiza(); //ATUALIZA A PARTE LÓGICA DO JOGO
 				tela.repaint(); // MÉTODO QUE REPINTA A TELA
 				prxAtt = System.currentTimeMillis() + 1000 / FPS;
 			}
@@ -60,8 +60,24 @@ public class Jogo extends JFrame {
 	}
 
 	private void carregajogo() {
-		quadrado = new Quadrado(0, tela.getHeight()/2, 50, 50, 1);
-		quadrado.setCor(Color.RED);
+		player = new Player(0, 0, 40, 40, 5);
+		player.setPx(tela.getWidth() / 2 - player.getLargura() / 2);
+		player.setPy(tela.getHeight() - player.getAltura() - espacamento);
+	}
+
+	private void atualiza() {
+		movimentaPlayer();
+	}
+
+	private void movimentaPlayer() {
+		if (KeyListener.right)
+			player.incPx(player.getVelocidade());
+		if (KeyListener.left)
+			player.incPx(-player.getVelocidade());
+		if (player.getPx() > tela.getWidth())
+			player.setPx(0);
+		if (player.getPx() < 0)
+			player.setPx(tela.getWidth() - player.getLargura());
 	}
 
 	public static void main(String[] args) {
