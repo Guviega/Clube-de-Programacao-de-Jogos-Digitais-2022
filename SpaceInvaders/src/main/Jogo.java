@@ -24,6 +24,7 @@ public class Jogo extends JFrame {
 	private int inimigosAtivos;
 
 	// ELEMENTOS DO JOGO
+	private int pontos = 0;
 	private JPanel tela;
 	private Player player;
 	private Inimigo inimigos[];
@@ -44,6 +45,7 @@ public class Jogo extends JFrame {
 
 				// PINTANDO ELEMENTOS
 				paintElementos(g);
+				paintCabecalho(g);
 
 			}
 		};
@@ -54,6 +56,13 @@ public class Jogo extends JFrame {
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
+	}
+
+	private void paintCabecalho(Graphics g) {
+		g.setColor(Color.WHITE);
+		g.drawLine(0, 60, tela.getWidth(), 60);
+		g.drawString("Pontos: " + pontos, tela.getWidth() / 2 + 50, 35);
+		g.drawString("Vidas: " + vidas, tela.getWidth() / 2 - 80, 35);
 	}
 
 	private void paintElementos(Graphics g) {
@@ -94,14 +103,14 @@ public class Jogo extends JFrame {
 		player.setPx(tela.getWidth() / 2 - player.getLargura() / 2);
 		player.setPy(tela.getHeight() - player.getAltura() - espacamento);
 		player.setAtivo(true);
-		
+
 		tiro = new Tiro(0, 0, 5, 15, 15);
 		tiro.setCor(Color.BLUE);
 
 		inimigos = new Inimigo[quantidadeInimigos];
 		for (int i = 0; i < inimigos.length; i++) {
 			int espaco = i * 30 + espacamento * (i + 1);
-			inimigos[i] = new Inimigo(espaco + 2, espacamento, 25, 25, 1);
+			inimigos[i] = new Inimigo(espaco + 2, 60 + espacamento, 25, 25, 1);
 			inimigos[i].setAtivo(true);
 		}
 		tiroInimigo = new Tiro(0, 0, 5, 10, 10);
@@ -125,7 +134,7 @@ public class Jogo extends JFrame {
 			tiro.setPy(player.getPy());
 			tiro.setAtivo(true);
 		}
-		if (tiro.getPy() < 0)
+		if (tiro.getPy() < 60)
 			tiro.setAtivo(false);
 		if (tiro.isAtivo())
 			tiro.incPy(tiro.getVelocidade() * -1);
@@ -163,6 +172,7 @@ public class Jogo extends JFrame {
 			if (tiro.isAtivo() && inimigo.isAtivo() && Util.colide(inimigo, tiro)) {
 				inimigo.setAtivo(false);
 				inimigosAtivos--;
+				pontos += 10;
 				tiro.setAtivo(false);
 			}
 
