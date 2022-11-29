@@ -20,13 +20,14 @@ public class Jogo extends JFrame {
 	private int LARGURA = 540, ALTURA = 480;
 	private int espacamento = 8; // ESPACAMENTO PADRÃO DO JOGO
 	private int quantidadeInimigos = 13;
+	private int vidas = 5;
 	private int inimigosAtivos;
 
 	// ELEMENTOS DO JOGO
 	private JPanel tela;
 	private Player player;
 	private Inimigo inimigos[];
-	private Tiro tiro;
+	private Tiro tiro, tiroInimigo;
 	private int inimigoDir = 1;
 	private boolean moveInimigos;
 	private boolean novaLinha;
@@ -57,6 +58,7 @@ public class Jogo extends JFrame {
 
 	private void paintElementos(Graphics g) {
 		tiro.paintIfAtivo(g);
+		tiroInimigo.paintIfAtivo(g);
 		player.paint(g);
 		for (Inimigo inimigo : inimigos)
 			inimigo.paintIfAtivo(g);
@@ -91,7 +93,8 @@ public class Jogo extends JFrame {
 		player = new Player(0, 0, 40, 40, 5);
 		player.setPx(tela.getWidth() / 2 - player.getLargura() / 2);
 		player.setPy(tela.getHeight() - player.getAltura() - espacamento);
-
+		player.setAtivo(true);
+		
 		tiro = new Tiro(0, 0, 5, 15, 15);
 		tiro.setCor(Color.BLUE);
 
@@ -101,18 +104,22 @@ public class Jogo extends JFrame {
 			inimigos[i] = new Inimigo(espaco + 2, espacamento, 25, 25, 1);
 			inimigos[i].setAtivo(true);
 		}
+		tiroInimigo = new Tiro(0, 0, 5, 10, 10);
+		tiroInimigo.setCor(Color.RED);
 	}
 
 	private void atualiza() {
+		if (vidas == 0 || inimigosAtivos == 0)
+			jogando = false;
+
 		movimentaPlayer();
 		tiroPlayer();
 		verificaInimigos();
+		movimentaTiroInimigo();
+		tiroInimigoOnPlayer();
 	}
 
 	private void tiroPlayer() {
-		if (inimigosAtivos == 0)
-			jogando = false;
-
 		if (KeyListener.space && !tiro.isAtivo()) {
 			tiro.setPx(player.getPx() + player.getLargura() / 2 - tiro.getLargura() / 2);
 			tiro.setPy(player.getPy());
@@ -122,6 +129,13 @@ public class Jogo extends JFrame {
 			tiro.setAtivo(false);
 		if (tiro.isAtivo())
 			tiro.incPy(tiro.getVelocidade() * -1);
+	}
+
+	private void tiroInimigoOnPlayer() {
+		if (Util.colide(player, tiroInimigo)) {
+			vidas--;
+			tiroInimigo.setAtivo(false);
+		}
 	}
 
 	private void movimentaPlayer() {
@@ -163,6 +177,13 @@ public class Jogo extends JFrame {
 					if (pxEsq <= 0 || pxDir >= tela.getWidth())
 						colideBordas = true;
 				}
+
+				if (!tiroInimigo.isAtivo() && inimigo.getPx() > player.getPx()
+						&& inimigo.getPx() < player.getPx() + player.getLargura()) {
+					tiroInimigo.setPx(inimigo.getPx() + inimigo.getLargura() / 2 - tiroInimigo.getLargura() / 2);
+					tiroInimigo.setPy(inimigo.getPy());
+					tiroInimigo.setAtivo(true);
+				}
 			}
 		}
 		if (moveInimigos && novaLinha) {
@@ -172,6 +193,13 @@ public class Jogo extends JFrame {
 			novaLinha = true;
 		}
 		moveInimigos = false;
+	}
+
+	private void movimentaTiroInimigo() {
+		if (tiroInimigo.getPy() > tela.getHeight())
+			tiroInimigo.setAtivo(false);
+		if (tiroInimigo.isAtivo())
+			tiroInimigo.incPy(tiroInimigo.getVelocidade());
 	}
 
 	public static void main(String[] args) {
